@@ -18,21 +18,27 @@ public class Marker : MonoBehaviour
     private Vector2 _lastTouchPos;
     private Quaternion _lastTouchRot;
 
+
+    Rigidbody m_Rigidbody;
+
     void Start()
     {
         
         _renderer = _tip.GetComponent<Renderer>();
         _colors = Enumerable.Repeat(_renderer.material.color, _penSize* _penSize).ToArray();
         //_tipHeight = _tip.localScale.x;
-        
+        m_Rigidbody = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
     void Update()
     {
         Draw();
+        Contact();
     }
-
+    private void Contact(){
+    
+    }
     private void Draw(){
         Debug.DrawRay(_tip.position, _tip.right * _tipHeight, Color.red);
         if(Physics.Raycast(_tip.position,_tip.right, out _touch, _tipHeight)){
@@ -41,6 +47,7 @@ public class Marker : MonoBehaviour
                 if(_whiteboard == null){
                     _whiteboard = _touch.transform.GetComponent<Whiteboard>();
                 }
+                m_Rigidbody.freezeRotation = true;
             }
             else{
                 return;
@@ -76,5 +83,6 @@ public class Marker : MonoBehaviour
         }
         _whiteboard = null;
         _touchedLastFrame= false;
+        m_Rigidbody.freezeRotation = false;
     }
 }
