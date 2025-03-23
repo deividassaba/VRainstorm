@@ -1,8 +1,4 @@
-<<<<<<< Updated upstream
-using UnityEngine;
-=======
 /*using UnityEngine;
->>>>>>> Stashed changes
 using UnityEngine.XR;
 using System.Linq;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -165,7 +161,4 @@ public class Marker : MonoBehaviour
         isGrabed=false;
     }
 }
-<<<<<<< Updated upstream
-=======
 */
->>>>>>> Stashed changes
