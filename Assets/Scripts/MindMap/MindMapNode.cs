@@ -1,11 +1,19 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.XR;
+using UnityEngine.XR.Interaction.Toolkit;
+using Fusion;
 public class MindMapNode : MonoBehaviour
 {
+
+    private UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable grabInteractable;
+    private bool isTriggerPressed;
+
     [SerializeField] public bool isDeleting;
     [SerializeField] public bool Select;
     [SerializeField] public bool isSelected;
     [SerializeField] public bool isEditing;
+    private bool isHovered;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private Transform[] Nodes;
     private LineRenderer[] Lines;
@@ -16,6 +24,12 @@ public class MindMapNode : MonoBehaviour
     
     void Start()
     {
+        grabInteractable = GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
+        grabInteractable.hoverEntered.AddListener(OnHoverEntered);
+        grabInteractable.hoverExited.AddListener(OnHoverExited);
+
+        isHovered=false;
+        
         parentGameObject = this.transform.parent.gameObject;
         mindMap = GetComponentInParent<MindMap>();
         isSelected = false;
@@ -24,9 +38,27 @@ public class MindMapNode : MonoBehaviour
         textTMP.text = transform.name;
     }
 
-    // Update is called once per frame
     void Update()
     {
+
+        if (isHovered)
+        {
+            InputDevice rightController = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
+            InputDevice leftController = InputDevices.GetDeviceAtXRNode(XRNode.LeftHand);
+
+            if (rightController.TryGetFeatureValue(CommonUsages.trigger, out float triggerAxisVal))
+            {            
+                if (triggerAxisVal>0 && !isTriggerPressed)
+                {
+                    Select=true;
+                    isTriggerPressed = true;
+                }
+                else if (triggerAxisVal==0 && isTriggerPressed)
+                {
+                    isTriggerPressed = false;
+                }
+            }
+        }
         if (Select)
         {
             if(!isSelected){
@@ -40,4 +72,13 @@ public class MindMapNode : MonoBehaviour
             //Destroy(transform.gameObject);
         }
     }
+
+
+    private void OnDestroy()
+    {
+        grabInteractable.hoverEntered.RemoveListener(OnHoverEntered);
+        grabInteractable.hoverExited.RemoveListener(OnHoverExited);
+    }
+    void OnHoverEntered(HoverEnterEventArgs args){ isHovered=true;}
+    void OnHoverExited(HoverExitEventArgs args){ isHovered=false;}
 }

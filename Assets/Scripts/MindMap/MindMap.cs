@@ -1,10 +1,17 @@
 using UnityEngine;
+using UnityEngine.XR;
+using System.Linq;
+using UnityEngine.XR.Interaction.Toolkit;
+using Fusion;
+using TMPro;
 public class MindMap : MonoBehaviour
 {
+    
     private GameObject selected1;
     private GameObject selected2;
     private GameObject selectedLine;
     private LineRenderer[] Lines;
+
     [SerializeField] private int MaxConections=20;
 
     private GameObject[] Nodes1;
@@ -15,16 +22,26 @@ public class MindMap : MonoBehaviour
     [SerializeField] private GameObject objectToClone ;
     [SerializeField] Vector3 clonePosition ;
 
+    private bool yButtonPressed;
+
+    [SerializeField] private GameObject Canvas;
+    [SerializeField] private GameObject text_input;
+    MindMapNode MMN;
     void Start()
     {
+        Canvas.SetActive(false);
         Nodes1 = new GameObject[MaxConections];
         Nodes2 = new GameObject[MaxConections];
         Lines = new LineRenderer[MaxConections];
+
         lineCount = 0;
         nodeCount = 0;
+
+        yButtonPressed= false;
     }
     void Update()
     {
+        RightInput();
         for(int i = 0 ; i < transform.childCount; i++){
             GameObject ChildGameObject = transform.GetChild(i).gameObject;
             MindMapNode mindMapNode = ChildGameObject.GetComponent<MindMapNode>();
@@ -65,6 +82,11 @@ public class MindMap : MonoBehaviour
                     else{
                         selected1 = ChildGameObject;
                     }
+                }
+                //
+                if(mindMapNode.isEditing){
+                    MMN=mindMapNode;
+                    Canvas.SetActive(true);
                 }
                 //trinimas
                 if(mindMapNode.isDeleting){
@@ -141,5 +163,41 @@ public class MindMap : MonoBehaviour
         }
     }
 
-
+    private void RightInput(){
+        InputDevice rightController = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
+        if (rightController.isValid)
+        {
+            if (rightController.TryGetFeatureValue(CommonUsages.secondaryButton, out bool isPressed))
+            {
+                if (isPressed && !yButtonPressed)
+                {
+                    doClone = true;
+                    yButtonPressed = true;
+                }
+                else if (!isPressed && yButtonPressed) {yButtonPressed = false;}
+            }
+        }
+    }
+    public void DoneButtonClick(){
+        
+        
+        TMP_InputField  textTMP_input = text_input.GetComponent<TMP_InputField >();
+        transform.name=textTMP_input.text;
+        GameObject textObject= MMN.transform.GetChild(0).gameObject; 
+        TextMeshPro textTMP = textObject.GetComponent<TextMeshPro >();
+        textTMP.text = transform.name;
+        
+        
+        MMN.isEditing=false;
+        MMN=null;
+        Canvas.SetActive(false);
+    }
+    public void DeleteButtonClick(){
+        
+        MMN.isDeleting=true;
+        
+        MMN.isEditing=false;
+        MMN=null;
+        Canvas.SetActive(false);
+    }
 }
