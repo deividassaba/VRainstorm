@@ -14,6 +14,11 @@ public class MindMapLink : MonoBehaviour
     }
 
     // Update is called once per frame
+    /*
+    spustelt ant linijos pasirenkama
+    kiti du pasirinkimai ant burbulu pakeicia rysi  
+    du spustelejimai ant linijos ja istrina
+    */
     void Update()
     {
         if (Select)
@@ -22,9 +27,11 @@ public class MindMapLink : MonoBehaviour
                 isSelected=true;
             }
             else{
-                isEditing=true;
+                //isEditing=true;
+                isDeleting= true;
                 isSelected=false;
             }
+
             Select=false;
             //Destroy(transform.gameObject);
         }

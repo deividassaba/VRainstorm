@@ -21,7 +21,8 @@ public class MindMap : MonoBehaviour
     [SerializeField] private bool doClone=false;
     [SerializeField] private GameObject objectToClone ;
     [SerializeField] Vector3 clonePosition ;
-
+    [SerializeField] private GameObject RightConrollerObject ;
+    [SerializeField] private float distance ;
     private bool yButtonPressed;
 
     [SerializeField] private GameObject Canvas;
@@ -121,6 +122,7 @@ public class MindMap : MonoBehaviour
             }
             
         }
+        //brazomos/redaguojamos linijos naujos
         for(int i = 0 ; i < lineCount; i++){
             GameObject Node1 = Nodes1[i]; 
             GameObject Node2 = Nodes2[i];
@@ -145,24 +147,18 @@ public class MindMap : MonoBehaviour
         }
 
         //klonuoti
-        if (doClone)
-        {
-            // Create a copy of the object at the same position and rotation
-            //GameObject clone = Instantiate(objectToClone, objectToClone.transform.position, objectToClone.transform.rotation, objectToClone.transform.parent);
-            GameObject clone = Instantiate(objectToClone, clonePosition, objectToClone.transform.rotation, objectToClone.transform.parent);
-            // Optional: Modify the clone, like setting a new name
-            ///clone.name = objectToClone.name + "_Clone";
-            nodeCount+=1;
-            clone.name = "Node_" +nodeCount;
-            doClone=false;
-        }
+        DoClone();
         
         //double-click
         if(false){
 
         }
     }
+    /*
 
+    yButtonPressed paspaudus mygtuka padaromas klonas
+    
+    */
     private void RightInput(){
         InputDevice rightController = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
         if (rightController.isValid)
@@ -176,6 +172,24 @@ public class MindMap : MonoBehaviour
                 }
                 else if (!isPressed && yButtonPressed) {yButtonPressed = false;}
             }
+        }
+    }
+    //klonuoti
+    public void DoClone(){
+        InputDevice rightController = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
+        if (doClone)
+        {
+            Vector3 clonePos = RightConrollerObject.transform.position;
+            //clonePos.x+=distance;
+            clonePos = clonePos +RightConrollerObject.transform.forward * distance;
+            //GameObject clone = Instantiate(objectToClone, objectToClone.transform.position, objectToClone.transform.rotation, objectToClone.transform.parent);
+            GameObject clone = Instantiate(objectToClone, clonePos , objectToClone.transform.rotation, objectToClone.transform.parent);
+            
+            // Optional: Modify the clone, like setting a new name
+            ///clone.name = objectToClone.name + "_Clone";
+            nodeCount+=1;
+            clone.name = "Node_" +nodeCount;
+            doClone=false;
         }
     }
     public void DoneButtonClick(){
@@ -200,4 +214,19 @@ public class MindMap : MonoBehaviour
         MMN=null;
         Canvas.SetActive(false);
     }
+    public void ColorButtonClick(){
+        MMN.isCyclingColor=true;
+        
+        MMN.isEditing=false;
+        MMN=null;
+        Canvas.SetActive(false);
+    }
+    public void ShapeButtonClick(){
+        MMN.toggleShape=true;
+        
+        MMN.isEditing=false;
+        MMN=null;
+        Canvas.SetActive(false);
+    }
+
 }
