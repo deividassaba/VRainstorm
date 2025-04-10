@@ -4229,7 +4229,7 @@ MonoBehaviour:
   doClone: 1
   objectToClone: {fileID: 976969241}
   clonePosition: {x: -1.492263, y: 1.333167, z: 2.665375}
-  RightConrollerObject: {fileID: 108706254}
+  rightController: {fileID: 108706254}
   distance: 2
   Canvas: {fileID: 2003481675}
   text_input: {fileID: 0}

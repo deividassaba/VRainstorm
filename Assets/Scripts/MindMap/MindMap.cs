@@ -21,13 +21,15 @@ public class MindMap : MonoBehaviour
     [SerializeField] private bool doClone=false;
     [SerializeField] private GameObject objectToClone ;
     [SerializeField] Vector3 clonePosition ;
-    [SerializeField] private GameObject RightConrollerObject ;
+    [SerializeField] private GameObject rightController ;
     [SerializeField] private float distance ;
     private bool yButtonPressed;
 
     [SerializeField] private GameObject Canvas;
     [SerializeField] private GameObject text_input;
     MindMapNode MMN;
+    private bool isTriggerPressed;
+    [SerializeField] private float testTriggerValue;
     void Start()
     {
         Canvas.SetActive(false);
@@ -37,12 +39,14 @@ public class MindMap : MonoBehaviour
 
         lineCount = 0;
         nodeCount = 0;
-
+        isTriggerPressed =false;
         yButtonPressed= false;
     }
     void Update()
     {
+        LineRay();
         RightInput();
+        if(doClone) DoClone();
         for(int i = 0 ; i < transform.childCount; i++){
             GameObject ChildGameObject = transform.GetChild(i).gameObject;
             MindMapNode mindMapNode = ChildGameObject.GetComponent<MindMapNode>();
@@ -131,6 +135,13 @@ public class MindMap : MonoBehaviour
                 GameObject lineObject = new GameObject("Line " + (i));
                 lineObject.transform.SetParent(transform);
                 lineRenderer = lineObject.AddComponent<LineRenderer>();
+                
+                BoxCollider BoxCollider = lineObject.AddComponent<BoxCollider>();
+                //BoxCollider.size = new Vector3(0.2f, 0.1f, 0.1f);
+                AddColliderToLine(BoxCollider,Node1.transform.position,Node2.transform.position );
+
+                lineObject.tag = "Line";
+
                 MindMapLink link = lineObject.AddComponent<MindMapLink>();
                 link.id=i;
                 lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
@@ -145,9 +156,7 @@ public class MindMap : MonoBehaviour
             lineRenderer.SetPosition(0, Node1.transform.position);
             lineRenderer.SetPosition(1, Node2.transform.position);
         }
-
-        //klonuoti
-        DoClone();
+        
         
         //double-click
         if(false){
@@ -160,10 +169,10 @@ public class MindMap : MonoBehaviour
     
     */
     private void RightInput(){
-        InputDevice rightController = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
-        if (rightController.isValid)
+        InputDevice rightControllerInput = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
+        if (rightControllerInput.isValid)
         {
-            if (rightController.TryGetFeatureValue(CommonUsages.secondaryButton, out bool isPressed))
+            if (rightControllerInput.TryGetFeatureValue(CommonUsages.secondaryButton, out bool isPressed))
             {
                 if (isPressed && !yButtonPressed)
                 {
@@ -174,23 +183,52 @@ public class MindMap : MonoBehaviour
             }
         }
     }
-    //klonuoti
-    public void DoClone(){
-        InputDevice rightController = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
-        if (doClone)
+    public void LineRay(){
+        Vector3 forward = rightController.transform.TransformDirection(Vector3.forward) * 10;
+        //Debug.DrawRay(rightController.transform.position, forward, Color.green);
+        InputDevice rightControllerInput = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
+        RaycastHit hit;
+        if (Physics.Raycast(rightController.transform.position, rightController.transform.forward, out hit, 10))
         {
-            Vector3 clonePos = RightConrollerObject.transform.position;
-            //clonePos.x+=distance;
-            clonePos = clonePos +RightConrollerObject.transform.forward * distance;
-            //GameObject clone = Instantiate(objectToClone, objectToClone.transform.position, objectToClone.transform.rotation, objectToClone.transform.parent);
-            GameObject clone = Instantiate(objectToClone, clonePos , objectToClone.transform.rotation, objectToClone.transform.parent);
-            
-            // Optional: Modify the clone, like setting a new name
-            ///clone.name = objectToClone.name + "_Clone";
-            nodeCount+=1;
-            clone.name = "Node_" +nodeCount;
-            doClone=false;
+            if(hit.collider.CompareTag("Line")){
+                
+
+                //Debug.Log(hit.transform.gameObject.name);
+                if (rightControllerInput.TryGetFeatureValue(CommonUsages.trigger , out float triggerValue) || true)
+                {
+                    triggerValue=testTriggerValue;
+                    if(triggerValue <= 0.1f && isTriggerPressed){
+                        Debug.Log("Trigger not pressed");
+                        isTriggerPressed=false;
+                    }
+                    //Debug.Log(hit.transform.gameObject.name);
+                    if (triggerValue > 0.1f && !isTriggerPressed) 
+                    {
+                        Debug.Log("selected");
+                        MindMapLink mindMapLink = hit.transform.gameObject.GetComponent<MindMapLink>();
+                        mindMapLink.Select=true;
+                        isTriggerPressed=true;
+                    }
+                }
+
+            }
         }
+    }
+    //klonuoti
+    public void DoClone()
+    {
+        Vector3 clonePos = rightController.transform.position;
+        //clonePos.x+=distance;
+        clonePos = clonePos +rightController.transform.forward * distance;
+        //GameObject clone = Instantiate(objectToClone, objectToClone.transform.position, objectToClone.transform.rotation, objectToClone.transform.parent);
+        GameObject clone = Instantiate(objectToClone, clonePos , objectToClone.transform.rotation, objectToClone.transform.parent);
+        
+        // Optional: Modify the clone, like setting a new name
+        ///clone.name = objectToClone.name + "_Clone";
+        nodeCount+=1;
+        clone.name = "Node_" +nodeCount;
+        doClone=false;
+        
     }
     public void DoneButtonClick(){
         
@@ -228,5 +266,20 @@ public class MindMap : MonoBehaviour
         MMN=null;
         Canvas.SetActive(false);
     }
+    void AddColliderToLine(BoxCollider boxCollider, Vector3 start, Vector3 end)
+    {
+        Vector3 direction = end - start;
+        float length = direction.magnitude;
 
+        // Set collider size (length along X, thin height/depth)
+        boxCollider.size = new Vector3(length, 0.1f, 0.1f);
+        boxCollider.center = new Vector3(0f,0f,0f);
+        // Position: center of the line
+        Vector3 center = (start + end) / 2f;
+        boxCollider.transform.position = center;
+
+        // Rotation: align the collider's X-axis with the direction
+        Quaternion rotation = Quaternion.LookRotation(direction);
+        boxCollider.transform.rotation = rotation * Quaternion.Euler(0, -90, 0); // Adjust for local X alignment
+    }
 }
