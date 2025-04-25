@@ -23,15 +23,18 @@ public class MindMapNode : MonoBehaviour
     private MindMap mindMap;
     private GameObject parentGameObject;
     private GameObject formObject;
-    private Color[] Colors;
-    private int color_id;
+    private Color[]  Colors = new Color[]{
+            Color.red,Color.blue,Color.green,Color.black
+        };
+    public int color_id;
 
-
+    public int id;
     private MeshFilter meshFilter;
     public bool toggleShape = true;
-    private int shape_id;
-
-    void Start()
+    public int shape_id;
+    private GameObject textObject;
+    private TextMeshPro textTMP;
+    void Awake()
     {
         grabInteractable = GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
         grabInteractable.hoverEntered.AddListener(OnHoverEntered);
@@ -42,26 +45,27 @@ public class MindMapNode : MonoBehaviour
         parentGameObject = this.transform.parent.gameObject;
         mindMap = GetComponentInParent<MindMap>();
         isSelected = false;
-        GameObject textObject= transform.GetChild(0).gameObject;         
-        TextMeshPro textTMP = textObject.GetComponent<TextMeshPro >();
-        textTMP.text = transform.name;
+           
 
-        Colors = new Color[]{
-            Color.red,Color.blue,Color.green,Color.black
-        };
+        textObject= transform.GetChild(0).gameObject;      
+        textTMP = textObject.GetComponent<TextMeshPro>();
+        SetName(transform.name);
+
         color_id=0;
         formObject= transform.GetChild(1).gameObject; 
-        CycleColor();
-
+        SetColor(0);
+        
         meshFilter = formObject.GetComponent<MeshFilter>();
         shape_id=0;
-        ToggleShape();
+        SetShape(0);
     }
-
+    void Start(){
+        
+    }
     void Update()
     {
-        if(isCyclingColor) CycleColor();
-        if(toggleShape) ToggleShape();
+        if(isCyclingColor) SetColor();
+        if(toggleShape) SetShape();
         if (isHovered)
         {
             InputDevice rightController = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
@@ -94,22 +98,35 @@ public class MindMapNode : MonoBehaviour
         }
     }
 
-    private void CycleColor(){
+    public void SetColor(int c_id = -1){
+        if(c_id == -1){
+            color_id++;
+            color_id%=Colors.Length;    
+        }
+        else color_id=c_id;
         formObject.GetComponent<Renderer>().material.color = Colors[color_id];
         isCyclingColor=false;
-        color_id++;
-        color_id%=Colors.Length;
     }
-    public void ToggleShape()
+    public void SetShape(int s_id = -1)
     {
-        GameObject temp = GameObject.CreatePrimitive(shape_id==0 ? PrimitiveType.Sphere : PrimitiveType.Cube);
+        if(s_id == -1){
+            shape_id++;
+            shape_id%=2;
+        }
+        else shape_id=s_id;
+        GameObject temp;
+        temp = GameObject.CreatePrimitive(shape_id==0 ? PrimitiveType.Sphere : PrimitiveType.Cube);
         Mesh newMesh = temp.GetComponent<MeshFilter>().sharedMesh;
         Destroy(temp);
         meshFilter.mesh = newMesh;
-        shape_id++;
-        shape_id%=2;
+
         toggleShape=false;
-    }    
+    }
+    public void SetName(string name){
+        transform.name=name;
+        textTMP.text = transform.name;
+    }
+        
     private void OnDestroy()
     {
         grabInteractable.hoverEntered.RemoveListener(OnHoverEntered);
