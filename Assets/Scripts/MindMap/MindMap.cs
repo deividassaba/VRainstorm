@@ -74,19 +74,22 @@ public class MindMap : MonoBehaviour
         if(doImport && !deleted) deleteNodes();
         else if(doImport && deleted) import();
         if(takeScreenshot) TakeScreenshot();
-        for(int i = 1 ; i < transform.childCount; i++){
-            GameObject ChildGameObject = transform.GetChild(i).gameObject;
+        for(int i = 0 ; i < NodeContainer.transform.childCount; i++){
+            GameObject ChildGameObject = NodeContainer.transform.GetChild(i).gameObject;
             MindMapNode mindMapNode = ChildGameObject.GetComponent<MindMapNode>();
             MindMapLink mindMapLink = ChildGameObject.GetComponent<MindMapLink>();
             if(mindMapNode!=null){
                 if(mindMapNode.isSelected){
+                    Debug.Log(selected1);
+                    Debug.Log(selected2);
                     if(selected1==ChildGameObject){ //double click
 
                     }
                     if(selected1!=null && selected1 != ChildGameObject){
+                        Debug.Log("testas4");
                         if(selected2 == null){
+                            Debug.Log("testas2");
                             selected2 = ChildGameObject;
-                            
                             MindMapNode mindMapNode1 = selected1.GetComponent<MindMapNode>();
                             MindMapNode mindMapNode2 = selected2.GetComponent<MindMapNode>();
                                 
@@ -110,14 +113,19 @@ public class MindMap : MonoBehaviour
                             selected2=null;
                              
                         }
+                        else{
+                            Debug.Log("testas3");
+                        }
                     }
-                    else{
+                    else if(selected1==null){
+                        Debug.Log("testas1");
                         selected1 = ChildGameObject;
                     }
                 }
                 //
                 if(mindMapNode.isEditing){
                     MMN=mindMapNode;
+                    MMN.isEditing=false;
                     Canvas.SetActive(true);
                 }
                 //trinimas
@@ -506,7 +514,7 @@ public class MindMap : MonoBehaviour
         // 2. Move the camera to frame the bounds
         Vector3 direction = targetCamera.transform.forward * -1f; // Move opposite to where it's looking
         float distance = radius * padding;
-
+ 
         // Optional: Adjust distance based on camera's FOV
         if (targetCamera.orthographic)
         {

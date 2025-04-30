@@ -1546,9 +1546,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: ConnectionManager, Assembly-CSharp
-        m_MethodName: CreateRoom
+      - m_Target: {fileID: 2096786605}
+        m_TargetAssemblyTypeName: MindMap, Assembly-CSharp
+        m_MethodName: DoneButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3105,9 +3105,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: ConnectionManager, Assembly-CSharp
-        m_MethodName: JoinRoom
+      - m_Target: {fileID: 2096786605}
+        m_TargetAssemblyTypeName: MindMap, Assembly-CSharp
+        m_MethodName: DeleteButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4413,7 +4413,7 @@ MonoBehaviour:
   rightController: {fileID: 108706254}
   distance: 2
   Canvas: {fileID: 2003481675}
-  text_input: {fileID: 0}
+  text_input: {fileID: 1455245744}
   testTriggerValue: 0
   targetCamera: {fileID: 1270125995}
   width: 1920
