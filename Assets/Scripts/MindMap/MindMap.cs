@@ -288,6 +288,7 @@ public class MindMap : MonoBehaviour
         MMN=null;
         takeScreenshot= true;
         Canvas.SetActive(false);
+
     }
     public void ColorButtonClick(){
         MMN.isCyclingColor=true;
@@ -394,11 +395,17 @@ public class MindMap : MonoBehaviour
         doExport = false;
     }
     void deleteNodes(){
+        List<GameObject> children = new List<GameObject>();
+        for (int i = 0; i < lineCount; i++) {
+            children.Add(Lines[i].transform.gameObject);
+        }
         for(int i = 0 ; i <lineCount;i++)
         {
             Nodes1[i] = null; 
             Nodes2[i] = null;
-            Destroy(Lines[i].transform.gameObject);
+        }
+        foreach (GameObject child in children) {
+            Destroy(child);
         }
         lineCount=0;
         nodeCount=0;
@@ -408,7 +415,7 @@ public class MindMap : MonoBehaviour
         //     Transform child = NodeContainer.transform.GetChild(i);
         //     Destroy(child.gameObject);
         // }
-        List<GameObject> children = new List<GameObject>();
+        children = new List<GameObject>();
         for (int i = 0; i < NodeContainer.transform.childCount; i++) {
             children.Add(NodeContainer.transform.GetChild(i).gameObject);
         }
