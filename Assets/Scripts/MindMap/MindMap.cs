@@ -14,7 +14,8 @@ public class MindMap : MonoBehaviour
     private GameObject selected2;
     private GameObject selectedLine;
     private LineRenderer[] Lines;
-    [SerializeField] private string MindMapFileName = "MyFile.txt";
+    [SerializeField] private string MindMapFileName = "MyFile.csv";
+    [SerializeField] private string MindMapScreenshotName = "MyMindMap.png";
     [SerializeField] private int MaxConections=20;
 
     private GameObject[] Nodes1;
@@ -42,9 +43,16 @@ public class MindMap : MonoBehaviour
     public int width = 1920;
     public int height = 1080;
     public bool takeScreenshot;
-    private string path;
+    [SerializeField] private string directory;
         
     private bool deleted; 
+    private string screenshot_directory;
+    private string file_directory;
+    private int importID=-1;
+    private string[] MindMapFileNames = new string[20];
+    private int MindMapFileCount = 0;
+    [SerializeField] private GameObject ChangeImportButton;
+
     void Start()
     {
         Canvas.SetActive(false);
@@ -57,13 +65,22 @@ public class MindMap : MonoBehaviour
         isTriggerPressed =false;
         yButtonPressed= false;
         takeScreenshot=false;
-        //string path = Application.persistentDataPath + "/" + MindMapFileName;
-        //Application.dataPath
-        path =Application.dataPath + "/" + MindMapFileName;
-        // WriteToFile(path, "Hello, Unity File System!");
-        Debug.Log(path);
+        
         deleted=false;
         current_id=0;
+        
+        screenshot_directory=  Application.persistentDataPath + "/Screenshots";
+        file_directory =  Application.persistentDataPath + "/MindMaps";
+        // C:\Users\deivi\AppData\LocalLow\DefaultCompany\MindMaps
+
+        //string file_path = Application.dataPath + "/" + MindMapFileName;
+        EnsureFolderExists(screenshot_directory);
+        EnsureFolderExists(file_directory);
+        LogFilesInFolder(file_directory);
+        Debug.Log(MindMapFileCount);
+        for(int i = 0; i < MindMapFileCount ; i++) {
+            Debug.Log(MindMapFileNames[i]);
+        }
     }
     void Update()
     {
@@ -264,45 +281,50 @@ public class MindMap : MonoBehaviour
     public void DoneButtonClick(){
         TMP_InputField  textTMP_input = text_input.GetComponent<TMP_InputField >();
         MMN.SetName(textTMP_input.text);
-        MMN.isEditing=false;
-        MMN=null;
-        Canvas.SetActive(false);
     }
     public void DeleteButtonClick(){
         MMN.isDeleting=true;
-        MMN.isEditing=false;
-        MMN=null;
-        Canvas.SetActive(false);
     }
     public void ImportButtonClick(){
+        TMP_Text textComponent = ChangeImportButton.GetComponent<TMP_Text>();
+        textComponent.text = "Select file";
         MMN=null;
         doImport=true;
         Canvas.SetActive(false);
+
     }
     public void ExportButtonClick(){
-        MMN=null;
+        TMP_InputField  textTMP_input = text_input.GetComponent<TMP_InputField >();
+        MindMapFileName= textTMP_input.text.Length > 0? textTMP_input.text+".csv" : "MyMindMap.csv";
         doExport=true;
-        Canvas.SetActive(false);
     }
     public void TakeScreenshotButtonClick(){
-        MMN=null;
+        TMP_InputField  textTMP_input = text_input.GetComponent<TMP_InputField >();
+        MindMapScreenshotName= textTMP_input.text.Length > 0? textTMP_input.text+".png" : "MyMindMap.png";
         takeScreenshot= true;
-        Canvas.SetActive(false);
-
     }
     public void ColorButtonClick(){
         MMN.isCyclingColor=true;
-        
+    }
+    public void ShapeButtonClick(){
+        MMN.toggleShape=true;
+    }
+    public void QuitButtonClick(){
         MMN.isEditing=false;
         MMN=null;
         Canvas.SetActive(false);
     }
-    public void ShapeButtonClick(){
-        MMN.toggleShape=true;
+    public void ImportFileNameButtonClick(){
+        TMP_Text textComponent = ChangeImportButton.GetComponent<TMP_Text>();
+        if(MindMapFileCount == 0){
+           textComponent.text = "No files found";
+           return; 
+        }
         
-        MMN.isEditing=false;
-        MMN=null;
-        Canvas.SetActive(false);
+        importID = (importID+1)%MindMapFileCount;
+        Debug.Log(importID);
+        Debug.Log(MindMapFileNames[importID]);
+        textComponent.text = MindMapFileNames[importID];
     }
     void AddColliderToLine(BoxCollider boxCollider, Vector3 start, Vector3 end)
     {
@@ -357,10 +379,11 @@ public class MindMap : MonoBehaviour
         }
     }
     void export(){
+        EnsureFolderExists(file_directory);
         // Nodes1[id] = selected1;
         // Nodes2[id] = selected2;
         //Lines
-        string path = Application.persistentDataPath + "/" + MindMapFileName;
+        //string path = Application.persistentDataPath + "/" + MindMapFileName;
         //Nodes
         string json="";
         // for( int i=0 ; i < nodeCount; i++){
@@ -371,6 +394,9 @@ public class MindMap : MonoBehaviour
         //     string name;
         //     json += string.Format("{0};{1}\n",id,name);
         // }
+        string path = file_directory + "/" + MindMapFileName;
+
+
         json += string.Format("{0};{1}\n",nodeCount,lineCount);
         for(int i = 0 ; i < NodeContainer.transform.childCount; i++){
             GameObject ChildGameObject = NodeContainer.transform.GetChild(i).gameObject;
@@ -393,6 +419,7 @@ public class MindMap : MonoBehaviour
         Debug.Log(json);   
         WriteToFile(path,json);
         doExport = false;
+        LogFilesInFolder(file_directory);
     }
     void deleteNodes(){
         List<GameObject> children = new List<GameObject>();
@@ -426,10 +453,8 @@ public class MindMap : MonoBehaviour
         deleted = true;
     }
     void import(){
-        
-        
-        
-        //string path = Application.persistentDataPath + "/" + MindMapFileName;
+        EnsureFolderExists(file_directory);
+        string path = file_directory + "/" + MindMapFileNames[importID];
         string[] lines = ReadFromFile(path).Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
 
         string[] header = lines[0].Split(';');
@@ -463,6 +488,7 @@ public class MindMap : MonoBehaviour
         }
         deleted = false;
         doImport = false;
+        importID=-1;
     }
     private GameObject findNodeByID(int id){
         for(int i = 0 ; i < NodeContainer.transform.childCount; i++){
@@ -478,11 +504,11 @@ public class MindMap : MonoBehaviour
 
     public void TakeScreenshot()
     {
-
-
+        
         // Vector3 pos = NodeContainer.transform.position; 
         // targetCamera.transform.position = pos; 
-
+        string path = screenshot_directory + "/" + MindMapScreenshotName;
+        Debug.Log(path);
         FocusCameraOnContainer();
         RenderTexture rt = new RenderTexture(width, height, 24);
         targetCamera.targetTexture = rt;
@@ -500,8 +526,8 @@ public class MindMap : MonoBehaviour
 
         // Optionally save to PNG
         byte[] bytes = screenshot.EncodeToPNG();
-        System.IO.File.WriteAllBytes(Application.dataPath + "/CameraScreenshot.png", bytes);
-        Debug.Log("Screenshot taken from " + targetCamera.name + " to : " + Application.dataPath + "/CameraScreenshot.png");
+        System.IO.File.WriteAllBytes(path, bytes);
+        Debug.Log("Screenshot taken from " + targetCamera.name + " to : " + path);
         takeScreenshot=false;
     }
     public void FocusCameraOnContainer()
@@ -535,6 +561,33 @@ public class MindMap : MonoBehaviour
 
         targetCamera.transform.position = center + direction.normalized * distance;
         targetCamera.transform.LookAt(center);
+    }
+    public static void EnsureFolderExists(string path)
+    {
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+            Debug.Log($"Folder created at: {path}");
+        }
+        else
+        {
+            Debug.Log($"Folder already exists: {path}");
+        }
+    }
+    public void LogFilesInFolder(string folderPath)
+    {
+        
+        if (!Directory.Exists(folderPath))
+        {
+            Debug.LogWarning($"Folder does not exist: {folderPath}");
+            return;
+        }
+        string[] files = Directory.GetFiles(folderPath);
+        MindMapFileCount =files.Length;
+        for (int i = 0; i < files.Length; i++)
+        {
+            MindMapFileNames[i] = Path.GetFileName(files[i]);
+        }
     }
 }
 
