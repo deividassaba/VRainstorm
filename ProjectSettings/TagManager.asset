@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Anchor
   - Whiteboard
+  - MindMapCamera
+  - Line
   layers:
   - Default
   - TransparentFX

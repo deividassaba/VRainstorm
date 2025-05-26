@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2957378897474383512
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 270181621197854545}
+  - component: {fileID: 7775472290377275224}
+  - component: {fileID: 7420940822344999889}
+  m_Layer: 0
+  m_Name: RunnerNodePrefab
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &270181621197854545
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2957378897474383512}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 7.369963, y: 2.239369, z: 40.0825}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7775472290377275224
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2957378897474383512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1199893898, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7420940822344999889
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2957378897474383512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 465fb20d9339b1444adcaaf1318ea559, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MindMapFileName: MyFile.txt
+  MaxConections: 120
+  doClone: 0
+  doExport: 0
+  doImport: 0
+  objectToClone: {fileID: 4851619891391209271, guid: 1aece55c7f7b0704db4ac75d8a552a98, type: 3}
+  NodeContainer: {fileID: 0}
+  clonePosition: {x: 0, y: 0, z: 0}
+  rightController: {fileID: 262591646680979368, guid: 7575fcea8269c9e4cb71ca06e74987bb, type: 3}
+  distance: 0
+  Canvas: {fileID: 5372567648516968950, guid: 02b806593635b96479445dd5e9257378, type: 3}
+  text_input: {fileID: 0}
+  testTriggerValue: 0
+  targetCamera: {fileID: 0}
+  width: 1920
+  height: 1080
+  takeScreenshot: 0

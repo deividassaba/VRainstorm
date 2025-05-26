@@ -1,2 +1,17 @@
 fileFormatVersion: 2
 guid: 465fb20d9339b1444adcaaf1318ea559
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - objectToClone: {fileID: 4851619891391209271, guid: 1aece55c7f7b0704db4ac75d8a552a98, type: 3}
+  - NodeContainer: {instanceID: 0}
+  - rightController: {fileID: 262591646680979368, guid: 7575fcea8269c9e4cb71ca06e74987bb, type: 3}
+  - Canvas: {fileID: 5372567648516968950, guid: 02b806593635b96479445dd5e9257378, type: 3}
+  - text_input: {instanceID: 0}
+  - targetCamera: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

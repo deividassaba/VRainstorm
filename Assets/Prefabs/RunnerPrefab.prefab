@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8778286323632652503}
   - component: {fileID: 8671750938405895869}
   - component: {fileID: 8362714867419938675}
+  - component: {fileID: 6096896790011640554}
   m_Layer: 0
   m_Name: RunnerPrefab
   m_TagString: Untagged
@@ -59,3 +60,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerPrefab:
     RawGuidValue: 7706b1897ffac8b4294cd71a325e448e
+--- !u!114 &6096896790011640554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7372068953451121039}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 465fb20d9339b1444adcaaf1318ea559, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MindMapFileName: MyFile.txt
+  MaxConections: 20
+  doClone: 0
+  doExport: 0
+  doImport: 0
+  objectToClone: {fileID: 8975266079403777798, guid: a277ef06d51bf314eaf8cfdb404f2e19, type: 3}
+  NodeContainer: {fileID: 0}
+  clonePosition: {x: 0, y: 0, z: 0}
+  rightController: {fileID: 0}
+  distance: 0
+  Canvas: {fileID: 0}
+  text_input: {fileID: 0}
+  testTriggerValue: 0
+  targetCamera: {fileID: 0}
+  width: 1920
+  height: 1080
+  takeScreenshot: 0

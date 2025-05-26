@@ -3,7 +3,9 @@ using TMPro;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
 using Fusion;
-public class MindMapNode : MonoBehaviour
+using Fusion.Sockets;
+
+public class MindMapNode : NetworkBehaviour
 {
 
     //Networked need be:
@@ -16,7 +18,14 @@ public class MindMapNode : MonoBehaviour
     [Networked]
     public string nodeName {  get; set; }
 
+    private int previousColorId = -1;
+    private int previousShapeId = -1;
+    private string previousNodeName = null;
 
+
+
+    //for text rotation
+    Camera mainCamera;
 
     [SerializeField]
     private TextMeshPro textTMP { get; set; }
@@ -53,42 +62,56 @@ public class MindMapNode : MonoBehaviour
     public bool toggleShape = true;
 
     private GameObject textObject;
-    
+
+    public override void Spawned()
+    {
+        base.Spawned();
+        Debug.Log("Node Spawned() called.");
+
+        //get camera
+        mainCamera = Camera.main;
+
+
+        textObject = transform.GetChild(0).gameObject;
+        textTMP = textObject.GetComponent<TextMeshPro>();
+        previousNodeName = transform.name;
+        SetName(transform.name);
+
+        color_id = 0;
+        previousColorId = 0;
+        formObject = transform.GetChild(1).gameObject;
+
+        SetColor(0);
+
+        meshFilter = formObject.GetComponent<MeshFilter>();
+        shape_id = 0;
+        previousShapeId = 0;
+        SetShape(0);
+    }
+
     void Awake()
     {
         grabInteractable = GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
         grabInteractable.hoverEntered.AddListener(OnHoverEntered);
         grabInteractable.hoverExited.AddListener(OnHoverExited);
 
-        isHovered=false;
-        
-        parentGameObject = this.transform.parent.gameObject;
+        isHovered = false;
 
-        // what the fuck does this even do???? What is it getting here?
+        // Come to think of it ive no clue what this does either
+        // parentGameObject = this.transform.parent.gameObject;
         mindMap = GetComponentInParent<MindMap>();
 
         isSelected = false;
-           
-
-        textObject= transform.GetChild(0).gameObject;      
-        textTMP = textObject.GetComponent<TextMeshPro>();
-        SetName(transform.name);
-
-        color_id=0;
-        formObject= transform.GetChild(1).gameObject; 
-        SetColor(0);
-        
-        meshFilter = formObject.GetComponent<MeshFilter>();
-        shape_id=0;
-        SetShape(0);
     }
+    
+
     
     void Start()
     {
         //galimai per cia reikes spawnint bet teoriškai gal ne?    
     }
     void Update()
-    {
+    {/*
         if(isCyclingColor) SetColor();
         if(toggleShape) SetShape();
         if (isHovered)
@@ -120,7 +143,78 @@ public class MindMapNode : MonoBehaviour
             }
             Select=false;
             //Destroy(transform.gameObject);
+        }*/
+    }
+
+    public override void FixedUpdateNetwork()
+    {
+        //Debug.Log("FixedNetworkUpdate is doing update things.");
+        //for cam text rotate
+        if (mainCamera != null && textObject != null)
+        {
+            textObject.transform.LookAt(mainCamera.transform);
+            textObject.transform.rotation = Quaternion.LookRotation(mainCamera.transform.forward);
         }
+        //for mp node attributes
+        //SetColor(color_id);
+        //SetShape(shape_id);
+        //SetName(nodeName);
+        if (isCyclingColor) SetColor();
+        if (toggleShape) SetShape();
+        if (isHovered)
+        {
+            InputDevice rightController = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
+            InputDevice leftController = InputDevices.GetDeviceAtXRNode(XRNode.LeftHand);
+
+            if (rightController.TryGetFeatureValue(CommonUsages.trigger, out float triggerAxisVal))
+            {
+                if (triggerAxisVal > 0 && !isTriggerPressed)
+                {
+                    Select = true;
+                    isTriggerPressed = true;
+                }
+                else if (triggerAxisVal == 0 && isTriggerPressed)
+                {
+                    isTriggerPressed = false;
+                }
+            }
+        }
+        if (Select)
+        {
+            if (!isSelected)
+            {
+                isSelected = true;
+            }
+            else
+            {
+                //Debug.Log("Node " + id + " was selected for editing");
+                isEditing = true;
+                isSelected = false;
+            }
+            Select = false;
+            //Destroy(transform.gameObject);
+        }
+
+        if (previousColorId != color_id)
+        {
+            SetColor(color_id);
+            previousColorId = color_id;
+        }
+
+        // React to shape changes
+        if (previousShapeId != shape_id)
+        {
+            SetShape(shape_id);
+            previousShapeId = shape_id;
+        }
+
+        // React to name changes
+        if (previousNodeName != nodeName)
+        {
+            SetName(nodeName);
+            previousNodeName = nodeName;
+        }
+
     }
 
     public void SetColor(int c_id = -1){
@@ -148,7 +242,13 @@ public class MindMapNode : MonoBehaviour
         toggleShape=false;
     }
     public void SetName(string name){
+<<<<<<< HEAD
         transform.name=name;
+=======
+        nodeName = name;
+        transform.name=name;
+        Debug.Log(transform.name);
+>>>>>>> e2adf9c (manual download)
         textTMP.text = transform.name;
     }
         
